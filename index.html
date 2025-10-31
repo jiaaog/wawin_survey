@@ -1,144 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Canada North/South Survey</title>
-  <meta charset="utf-8" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <meta charset="UTF-8">
+  <title>Wawin Site Survey</title>
+
+  <!-- Mobile scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-sA+e2tR8vTgfE7VZ8gy0aNAKrfN5A4BkL3V3BC6p2jU=" crossorigin=""/>
+
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #map { height: 500px; margin-top: 15px; }
-    .question { margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
-    .question h3 { margin: 0 0 10px; }
-  </style>
-</head>
-<body>
-  <h2>Survey: Identify Locations in Canada</h2>
-  <p>Please click exactly 3 points on the map for each of the following categories.</p>
-
-  <form id="surveyForm">
-    <!-- Four Questions -->
-    <div class="question">
-      <h3>1. Identify three locations that are definitely in Canada's <b>North</b></h3>
-      <input type="hidden" name="north" id="north">
-      <ul id="north-list"></ul>
-    </div>
-
-    <div class="question">
-      <h3>2. Identify three locations that are definitely in Canada's <b>South</b></h3>
-      <input type="hidden" name="south" id="south">
-      <ul id="south-list"></ul>
-    </div>
-
-    <div class="question">
-      <h3>3. Identify three locations that are in the <b>South but close to its northern limit</b></h3>
-      <input type="hidden" name="southLimit" id="southLimit">
-      <ul id="southLimit-list"></ul>
-    </div>
-
-    <div class="question">
-      <h3>4. Identify three locations that are in the <b>North but close to its southern limit</b></h3>
-      <input type="hidden" name="northLimit" id="northLimit">
-      <ul id="northLimit-list"></ul>
-    </div>
-
-    <button type="submit">Submit Survey</button>
-  </form>
-
-  <div id="map"></div>
-
-  <script>
-    // Setup Leaflet map
-    var map = L.map('map').setView([60, -95], 4); // Center over Canada
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    // Categories
-    const categories = {
-      north: { color: "blue", max: 3, points: [], markers: [] },
-      south: { color: "green", max: 3, points: [], markers: [] },
-      southLimit: { color: "orange", max: 3, points: [], markers: [] },
-      northLimit: { color: "red", max: 3, points: [], markers: [] }
-    };
-
-    // Current active category (default none until user selects)
-    let activeCategory = null;
-
-    // Handle map clicks
-    map.on('click', function(e) {
-      if (!activeCategory) {
-        alert("Please select a question to answer first by clicking its section.");
-        return;
-      }
-
-      let cat = categories[activeCategory];
-      if (cat.points.length >= cat.max) {
-        alert("You already selected 3 points for " + activeCategory);
-        return;
-      }
-
-      // Add marker
-      let marker = L.marker(e.latlng, { draggable: false })
-        .bindPopup(activeCategory + ": " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
-        .addTo(map);
-
-      // Save point
-      cat.points.push([e.latlng.lat, e.latlng.lng]);
-      cat.markers.push(marker);
-
-      // Update hidden input + list
-      document.getElementById(activeCategory).value = JSON.stringify(cat.points);
-      let li = document.createElement("li");
-      li.textContent = e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4);
-      document.getElementById(activeCategory + "-list").appendChild(li);
-    });
-
-    // Allow selecting a category by clicking on its box
-    document.querySelectorAll(".question").forEach(div => {
-      div.addEventListener("click", () => {
-        document.querySelectorAll(".question").forEach(d => d.style.background = "#fff");
-        div.style.background = "#f0f8ff";
-        activeCategory = div.querySelector("input").id;
-      });
-    });
-
-    // Handle form submit
-      document.getElementById("surveyForm").onsubmit = function(e) {
-    e.preventDefault();
-
-    // Check all categories have 3 points
-    for (let key in categories) {
-      if (categories[key].points.length !== 3) {
-        alert("Please select 3 points for " + key + " before submitting.");
-        return;
-      }
+    /* Base page styling */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+      color: #333;
     }
 
-    // Package the data
-    let data = {
-      north: categories.north.points,
-      south: categories.south.points,
-      southLimit: categories.southLimit.points,
-      northLimit: categories.northLimit.points
-    };
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 1em;
+    }
 
-    // Send to Google Sheets via Apps Script
-    fetch("https://script.google.com/macros/s/AKfycbzdL3pesPI-rotFSxgmT1k06AASBEskksMvzqTh9b7gosBLxtpEuFzKWa0bXc_JFILl/exec", {
-      method: "POST",
-      mode: "no-cors", // avoid CORS issues
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })
-    .then(() => {
-      alert("Survey submitted successfully!");
-      // Optionally clear map and reset form
-    })
-    .catch(err => {
-      console.error("Error:", err);
-      alert("Submission failed. Check console.");
+    h1 {
+      text-align: center;
+      font-size: 1.4em;
+      color: #1e3a8a;
+      margin-bottom: 0.5em;
+    }
+
+    h2 {
+      font-size: 1.2em;
+      margin-top: 1em;
+      color: #1e40af;
+    }
+
+    label, p {
+      display: block;
+      margin: 0.5em 0;
+    }
+
+    select, input[type="text"], textarea {
+      width: 100%;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    button {
+      display: inline-block;
+      width: 100%;
+      background-color: #3B82F6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.8em;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin-top: 1em;
+    }
+
+    button:hover {
+      background-color: #2563EB;
+    }
+
+    #map {
+      width: 100%;
+      height: 70vh;
+      border-radius: 10px;
+      margin-top: 1em;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      body {
+        font-size: 15px;
+        padding: 0;
+      }
+      h1 {
+        font-size: 1.2em;
+      }
+      #map {
+        height: 60vh;
+      }
+      button {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Wawin Site Survey</h1>
+    <p>Please click <strong>three points</strong> for each category below, then submit your responses.</p>
+
+    <h2>Step 1: Select Category</h2>
+    <label for="category">Choose a category:</label>
+    <select id="category">
+      <option value="Vegetation Type">Vegetation Type</option>
+      <option value="Water Table Level">Water Table Level</option>
+      <option value="Microtopography">Microtopography</option>
+    </select>
+
+    <h2>Step 2: Mark Points on Map</h2>
+    <p>Click on the map to mark your selected points (three per category).</p>
+    <div id="map"></div>
+
+    <button id="submit">Submit Survey</button>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-o9N1j7kS1Ry4EXyGkixdM08p38zN1bq+gWsM3N5rCXA=" crossorigin=""></script>
+
+  <script>
+    // Initialize map
+    var map = L.map('map').setView([49.7, -112.9], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let currentCategory = document.getElementById("category").value;
+    let points = { "Vegetation Type": [], "Water Table Level": [], "Microtopography": [] };
+    let markers = [];
+
+    // Add click listener
+    map.on('click', function (e) {
+      if (points[currentCategory].length >= 3) {
+        alert("You already selected 3 points for " + currentCategory + ".");
+        return;
+      }
+      let latlng = e.latlng;
+      points[currentCategory].push(latlng);
+      let marker = L.marker(latlng).addTo(map)
+        .bindPopup(currentCategory)
+        .openPopup();
+      markers.push(marker);
     });
-  };
-</script>
+
+    // Update category
+    document.getElementById("category").addEventListener("change", function () {
+      currentCategory = this.value;
+    });
+
+    // Submit data
+    document.getElementById("submit").addEventListener("click", function () {
+      let allFilled = Object.values(points).every(p => p.length === 3);
+      if (!allFilled) {
+        alert("Please select 3 points for each category before submitting.");
+        return;
+      }
+
+      let data = JSON.stringify(points);
+      console.log("Submitting data:", data);
+
+      fetch("https://script.google.com/macros/s/AKfycbz.../exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: data
+      });
+
+      alert("Survey submitted! Thank you.");
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+      points = { "Vegetation Type": [], "Water Table Level": [], "Microtopography": [] };
+    });
+
+    // Fix map resize on orientation change
+    window.addEventListener('resize', function () {
+      map.invalidateSize();
+    });
+  </script>
 </body>
 </html>
