@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Wawin Site Survey</title>
+  <title>Wawin Site Survey - Braiding Knowledge Canada</title>
 
-  <!-- Mobile scaling -->
+  <!-- Viewport for mobile scaling -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Leaflet CSS -->
@@ -12,17 +12,30 @@
     integrity="sha256-sA+e2tR8vTgfE7VZ8gy0aNAKrfN5A4BkL3V3BC6p2jU=" crossorigin=""/>
 
   <style>
-    /* Base page styling */
+    /* --- Base page styling --- */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Arial, sans-serif;
       font-size: 16px;
       line-height: 1.5;
       margin: 0;
       padding: 0;
-      background-color: #f7f7f7;
+      background-color: #f9fafb;
       color: #333;
     }
 
+    /* --- Banner --- */
+    .banner {
+      background: linear-gradient(90deg, #1e3a8a, #2563eb);
+      color: white;
+      text-align: center;
+      padding: 1.2em 0.5em;
+      font-size: 1.4em;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* --- Main container --- */
     .container {
       max-width: 800px;
       margin: auto;
@@ -31,15 +44,16 @@
 
     h1 {
       text-align: center;
-      font-size: 1.4em;
-      color: #1e3a8a;
+      font-size: 1.3em;
+      color: #1e40af;
       margin-bottom: 0.5em;
+      margin-top: 1em;
     }
 
     h2 {
-      font-size: 1.2em;
+      font-size: 1.1em;
       margin-top: 1em;
-      color: #1e40af;
+      color: #1e3a8a;
     }
 
     label, p {
@@ -49,12 +63,13 @@
 
     select, input[type="text"], textarea {
       width: 100%;
-      padding: 0.5em;
+      padding: 0.6em;
       border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 1em;
     }
 
+    /* --- Button --- */
     button {
       display: inline-block;
       width: 100%;
@@ -62,31 +77,37 @@
       color: white;
       border: none;
       border-radius: 8px;
-      padding: 0.8em;
-      font-size: 1.1em;
+      padding: 0.9em;
+      font-size: 1.05em;
       cursor: pointer;
-      margin-top: 1em;
+      margin-top: 1.2em;
+      transition: background 0.3s ease;
     }
 
     button:hover {
       background-color: #2563EB;
     }
 
+    /* --- Map --- */
     #map {
       width: 100%;
       height: 70vh;
       border-radius: 10px;
       margin-top: 1em;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
-    /* Responsive adjustments */
+    /* --- Responsive design --- */
     @media (max-width: 600px) {
       body {
         font-size: 15px;
-        padding: 0;
       }
       h1 {
+        font-size: 1.15em;
+      }
+      .banner {
         font-size: 1.2em;
+        padding: 1em 0.5em;
       }
       #map {
         height: 60vh;
@@ -99,6 +120,10 @@
 </head>
 
 <body>
+  <!-- Banner -->
+  <div class="banner">Braiding Knowledge Canada</div>
+
+  <!-- Main Content -->
   <div class="container">
     <h1>Wawin Site Survey</h1>
     <p>Please click <strong>three points</strong> for each category below, then submit your responses.</p>
@@ -124,7 +149,7 @@
 
   <script>
     // Initialize map
-    var map = L.map('map').setView([49.7, -112.9], 13);
+    const map = L.map('map').setView([49.7, -112.9], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors'
@@ -134,34 +159,34 @@
     let points = { "Vegetation Type": [], "Water Table Level": [], "Microtopography": [] };
     let markers = [];
 
-    // Add click listener
+    // Add click listener for map
     map.on('click', function (e) {
       if (points[currentCategory].length >= 3) {
         alert("You already selected 3 points for " + currentCategory + ".");
         return;
       }
-      let latlng = e.latlng;
+      const latlng = e.latlng;
       points[currentCategory].push(latlng);
-      let marker = L.marker(latlng).addTo(map)
+      const marker = L.marker(latlng).addTo(map)
         .bindPopup(currentCategory)
         .openPopup();
       markers.push(marker);
     });
 
-    // Update category
+    // Category change handler
     document.getElementById("category").addEventListener("change", function () {
       currentCategory = this.value;
     });
 
     // Submit data
     document.getElementById("submit").addEventListener("click", function () {
-      let allFilled = Object.values(points).every(p => p.length === 3);
+      const allFilled = Object.values(points).every(p => p.length === 3);
       if (!allFilled) {
         alert("Please select 3 points for each category before submitting.");
         return;
       }
 
-      let data = JSON.stringify(points);
+      const data = JSON.stringify(points);
       console.log("Submitting data:", data);
 
       fetch("https://script.google.com/macros/s/AKfycbz.../exec", {
@@ -171,16 +196,14 @@
         body: data
       });
 
-      alert("Survey submitted! Thank you.");
+      alert("Survey submitted successfully! Thank you for participating.");
       markers.forEach(m => map.removeLayer(m));
       markers = [];
       points = { "Vegetation Type": [], "Water Table Level": [], "Microtopography": [] };
     });
 
-    // Fix map resize on orientation change
-    window.addEventListener('resize', function () {
-      map.invalidateSize();
-    });
+    // Keep map responsive when resizing/orientation changes
+    window.addEventListener('resize', () => map.invalidateSize());
   </script>
 </body>
 </html>
