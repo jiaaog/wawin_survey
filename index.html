@@ -1,113 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Wawin Site Survey - Braiding Knowledge Canada</title>
+  <meta charset="utf-8" />
+  <title>Canada North/South Survey - Braiding Knowledge Canada</title>
 
-  <!-- Viewport for mobile scaling -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-sA+e2tR8vTgfE7VZ8gy0aNAKrfN5A4BkL3V3BC6p2jU=" crossorigin=""/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <style>
-    /* --- Base page styling --- */
+    /* --- Color Palette ---
+       Gold: #FFB71B
+       Aqua Blue: #00ABC8
+       Forest Green: #00774C
+       Dark Teal: #265057
+    */
+
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.5;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f9fafb;
-      color: #333;
+      color: #265057;
+      line-height: 1.5;
     }
 
     /* --- Banner --- */
     .banner {
-      background: linear-gradient(90deg, #1e3a8a, #2563eb);
-      color: white;
+      background-color: #265057;
+      color: #FFB71B;
       text-align: center;
-      padding: 1.2em 0.5em;
-      font-size: 1.4em;
+      padding: 1em 0.5em;
+      font-size: 1.5em;
       font-weight: 600;
       letter-spacing: 0.5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
     }
 
-    /* --- Main container --- */
+    /* --- Page container --- */
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
       padding: 1em;
     }
 
-    h1 {
-      text-align: center;
-      font-size: 1.3em;
-      color: #1e40af;
-      margin-bottom: 0.5em;
-      margin-top: 1em;
-    }
-
     h2 {
-      font-size: 1.1em;
+      color: #265057;
+      text-align: center;
       margin-top: 1em;
-      color: #1e3a8a;
     }
 
-    label, p {
-      display: block;
-      margin: 0.5em 0;
-    }
-
-    select, input[type="text"], textarea {
-      width: 100%;
-      padding: 0.6em;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+    p {
+      text-align: center;
       font-size: 1em;
+      color: #265057;
     }
 
-    /* --- Button --- */
+    .question {
+      margin-top: 20px;
+      padding: 12px;
+      border: 2px solid #00ABC8;
+      border-radius: 10px;
+      background-color: #fff;
+      transition: background 0.2s ease;
+    }
+
+    .question:hover {
+      background-color: #FFF5D6; /* subtle gold tint on hover */
+    }
+
+    .question h3 {
+      margin: 0 0 10px;
+      font-size: 1.05em;
+      color: #00774C;
+    }
+
+    ul {
+      padding-left: 20px;
+      font-size: 0.95em;
+    }
+
+    /* --- Buttons --- */
     button {
-      display: inline-block;
-      width: 100%;
-      background-color: #3B82F6;
-      color: white;
+      background-color: #00774C;
+      color: #ffffff;
       border: none;
       border-radius: 8px;
       padding: 0.9em;
       font-size: 1.05em;
       cursor: pointer;
+      width: 100%;
       margin-top: 1.2em;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
 
     button:hover {
-      background-color: #2563EB;
+      background-color: #00ABC8;
+      transform: scale(1.02);
     }
 
-    /* --- Map --- */
     #map {
       width: 100%;
       height: 70vh;
+      margin-top: 20px;
       border-radius: 10px;
-      margin-top: 1em;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 
-    /* --- Responsive design --- */
+    /* --- Mobile adjustments --- */
     @media (max-width: 600px) {
-      body {
-        font-size: 15px;
-      }
-      h1 {
-        font-size: 1.15em;
-      }
       .banner {
-        font-size: 1.2em;
-        padding: 1em 0.5em;
+        font-size: 1.3em;
+        padding: 0.8em 0.5em;
+      }
+      .container {
+        padding: 0.8em;
+      }
+      h2 {
+        font-size: 1.1em;
+      }
+      .question {
+        padding: 10px;
       }
       #map {
         height: 60vh;
@@ -120,89 +134,124 @@
 </head>
 
 <body>
-  <!-- Banner -->
   <div class="banner">Braiding Knowledge Canada</div>
 
-  <!-- Main Content -->
   <div class="container">
-    <h1>Wawin Site Survey</h1>
-    <p>Please click <strong>three points</strong> for each category below, then submit your responses.</p>
+    <h2>Survey: Identify Locations in Canada</h2>
+    <p>Please click exactly 3 points on the map for each of the following categories.</p>
 
-    <h2>Step 1: Select Category</h2>
-    <label for="category">Choose a category:</label>
-    <select id="category">
-      <option value="Vegetation Type">Vegetation Type</option>
-      <option value="Water Table Level">Water Table Level</option>
-      <option value="Microtopography">Microtopography</option>
-    </select>
+    <form id="surveyForm">
+      <div class="question">
+        <h3>1. Identify three locations that are definitely in Canada's <b>North</b></h3>
+        <input type="hidden" name="north" id="north">
+        <ul id="north-list"></ul>
+      </div>
 
-    <h2>Step 2: Mark Points on Map</h2>
-    <p>Click on the map to mark your selected points (three per category).</p>
+      <div class="question">
+        <h3>2. Identify three locations that are definitely in Canada's <b>South</b></h3>
+        <input type="hidden" name="south" id="south">
+        <ul id="south-list"></ul>
+      </div>
+
+      <div class="question">
+        <h3>3. Identify three locations that are in the <b>South but close to its northern limit</b></h3>
+        <input type="hidden" name="southLimit" id="southLimit">
+        <ul id="southLimit-list"></ul>
+      </div>
+
+      <div class="question">
+        <h3>4. Identify three locations that are in the <b>North but close to its southern limit</b></h3>
+        <input type="hidden" name="northLimit" id="northLimit">
+        <ul id="northLimit-list"></ul>
+      </div>
+
+      <button type="submit">Submit Survey</button>
+    </form>
+
     <div id="map"></div>
-
-    <button id="submit">Submit Survey</button>
   </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-o9N1j7kS1Ry4EXyGkixdM08p38zN1bq+gWsM3N5rCXA=" crossorigin=""></script>
-
   <script>
-    // Initialize map
-    const map = L.map('map').setView([49.7, -112.9], 13);
+    // --- Original JS logic preserved ---
+    var map = L.map('map').setView([60, -95], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    let currentCategory = document.getElementById("category").value;
-    let points = { "Vegetation Type": [], "Water Table Level": [], "Microtopography": [] };
-    let markers = [];
+    const categories = {
+      north: { color: "blue", max: 3, points: [], markers: [] },
+      south: { color: "green", max: 3, points: [], markers: [] },
+      southLimit: { color: "orange", max: 3, points: [], markers: [] },
+      northLimit: { color: "red", max: 3, points: [], markers: [] }
+    };
 
-    // Add click listener for map
-    map.on('click', function (e) {
-      if (points[currentCategory].length >= 3) {
-        alert("You already selected 3 points for " + currentCategory + ".");
-        return;
-      }
-      const latlng = e.latlng;
-      points[currentCategory].push(latlng);
-      const marker = L.marker(latlng).addTo(map)
-        .bindPopup(currentCategory)
-        .openPopup();
-      markers.push(marker);
-    });
+    let activeCategory = null;
 
-    // Category change handler
-    document.getElementById("category").addEventListener("change", function () {
-      currentCategory = this.value;
-    });
-
-    // Submit data
-    document.getElementById("submit").addEventListener("click", function () {
-      const allFilled = Object.values(points).every(p => p.length === 3);
-      if (!allFilled) {
-        alert("Please select 3 points for each category before submitting.");
+    map.on('click', function(e) {
+      if (!activeCategory) {
+        alert("Please select a question to answer first by clicking its section.");
         return;
       }
 
-      const data = JSON.stringify(points);
-      console.log("Submitting data:", data);
+      let cat = categories[activeCategory];
+      if (cat.points.length >= cat.max) {
+        alert("You already selected 3 points for " + activeCategory);
+        return;
+      }
 
-      fetch("https://script.google.com/macros/s/AKfycbz.../exec", {
+      let marker = L.marker(e.latlng, { draggable: false })
+        .bindPopup(activeCategory + ": " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
+        .addTo(map);
+
+      cat.points.push([e.latlng.lat, e.latlng.lng]);
+      cat.markers.push(marker);
+
+      document.getElementById(activeCategory).value = JSON.stringify(cat.points);
+      let li = document.createElement("li");
+      li.textContent = e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4);
+      document.getElementById(activeCategory + "-list").appendChild(li);
+    });
+
+    document.querySelectorAll(".question").forEach(div => {
+      div.addEventListener("click", () => {
+        document.querySelectorAll(".question").forEach(d => d.style.background = "#fff");
+        div.style.background = "#FFF5D6"; // soft gold tint for active section
+        activeCategory = div.querySelector("input").id;
+      });
+    });
+
+    document.getElementById("surveyForm").onsubmit = function(e) {
+      e.preventDefault();
+
+      for (let key in categories) {
+        if (categories[key].points.length !== 3) {
+          alert("Please select 3 points for " + key + " before submitting.");
+          return;
+        }
+      }
+
+      let data = {
+        north: categories.north.points,
+        south: categories.south.points,
+        southLimit: categories.southLimit.points,
+        northLimit: categories.northLimit.points
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbzdL3pesPI-rotFSxgmT1k06AASBEskksMvzqTh9b7gosBLxtpEuFzKWa0bXc_JFILl/exec", {
         method: "POST",
         mode: "no-cors",
         headers: { "Content-Type": "application/json" },
-        body: data
+        body: JSON.stringify(data)
+      })
+      .then(() => {
+        alert("Survey submitted successfully!");
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        alert("Submission failed. Check console.");
       });
+    };
 
-      alert("Survey submitted successfully! Thank you for participating.");
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
-      points = { "Vegetation Type": [], "Water Table Level": [], "Microtopography": [] };
-    });
-
-    // Keep map responsive when resizing/orientation changes
     window.addEventListener('resize', () => map.invalidateSize());
   </script>
 </body>
