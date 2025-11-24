@@ -505,25 +505,25 @@
         <h3>3. A little about your geography (Click 1 square per category on the map below)</h3>
 
         <div class="question" data-category="live05" data-map-id="mapQ3" data-max-points="1">
-          <h4>3.1. In what  <b>square</b> did you live for most of the period when you were <b>0-5 years old</b>? **(Optional)**</h4>
+          <h4>3.1. In what **square** did you live for most of the period when you were <b>0-5 years old</b>? **(Optional)**</h4>
           <input type="hidden" name="live05" id="live05">
           <ul id="live05-list"></ul>
         </div>
         
         <div class="question" data-category="live10" data-map-id="mapQ3" data-max-points="1">
-          <h4>3.2. In what  <b>square</b> have you lived for most of the last <b>10 years</b>? **(Optional)**</h4>
+          <h4>3.2. In what **square** have you lived for most of the last <b>10 years</b>? **(Optional)**</h4>
           <input type="hidden" name="live10" id="live10">
           <ul id="live10-list"></ul>
         </div>
         
         <div class="question" data-category="mostNorth" data-map-id="mapQ3" data-max-points="1">
-          <h4>3.3. What <b>square</b> is the <b>most northerly latitude</b> you have been in Canada? **(Optional)**</h4>
+          <h4>3.3. What **square** is the **most northerly latitude** you have been in Canada? **(Optional)**</h4>
           <input type="hidden" name="mostNorth" id="mostNorth">
           <ul id="mostNorth-list"></ul>
         </div>
         
         <div class="question" data-category="mostSouth" data-map-id="mapQ3" data-max-points="1">
-          <h4>3.4. What <b>square</b> is the <b>most southerly latitude</b> you have been in Canada? **(Optional)**</h4>
+          <h4>3.4. What **square** is the **most southerly latitude** you have been in Canada? **(Optional)**</h4>
           <input type="hidden" name="mostSouth" id="mostSouth">
           <ul id="mostSouth-list"></ul>
         </div>
@@ -613,24 +613,22 @@
     let activeQuestionDisplay = document.getElementById('activeQuestionDisplay');
     let geoJsonLayer = null;
 
+    // --- Map Initialization (Using Esri World Imagery as Basemap) ---
+    const esriImageryUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
+    const esriAttribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+
     // Initialize Map Q1 (Point Selection)
     var mapQ1 = L.map('map-q1').setView([60, -95], 4);
-   // Esri World Imagery (Satellite/Terrain)
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-  attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), (c) OpenStreetMap contributors, and the GIS User Community'
-  }).addTo(mapQ1); // Also add to mapQ3
+    L.tileLayer(esriImageryUrl, {
+      attribution: esriAttribution
+    }).addTo(mapQ1);
 
     // Initialize Map Q3 (Grid Selection)
-    var mapQ3 = L.map('map-q3').setView([60, -95], 5);
-  // Esri World TopoMap (Topographic/Labels)
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-  attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), (c) OpenStreetMap contributors, and the GIS User Community'
-  }).addTo(mapQ3); // for mapQ3
-    /***
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
+    var mapQ3 = L.map('map-q3').setView([60, -95], 4);
+    L.tileLayer(esriImageryUrl, {
+      attribution: esriAttribution
     }).addTo(mapQ3);
-    ***/
+    
     // --- Data Storage and Configuration ---
     const categories = {
       // Section 1 (mapQ1, point-based, max 3)
@@ -776,8 +774,11 @@
             }
           }).addTo(mapQ3);
           
-          // Fit map Q3 to the bounds of the loaded GeoJSON data
-          mapQ3.fitBounds(geoJsonLayer.getBounds()); 
+          // *******************************************************************
+          // FIX: REMOVED mapQ3.fitBounds() to maintain the setView zoom level 
+          // and match mapQ1's initial zoom.
+          // *******************************************************************
+          // mapQ3.fitBounds(geoJsonLayer.getBounds()); 
         })
         .catch(error => {
           console.error("Could not load GeoJSON data from GitHub URL:", error);
