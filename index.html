@@ -11,10 +11,10 @@
 
   <style>
     /* --- Color Palette ---
-       Gold: #FFB71B
-       Aqua Blue: #00ABC8
-       Forest Green: #00774C
-       Dark Teal: #265057
+      Gold: #FFB71B
+      Aqua Blue: #00ABC8
+      Forest Green: #00774C
+      Dark Teal: #265057
     */
 
     body {
@@ -49,6 +49,15 @@
       color: #265057;
       text-align: center;
       margin-top: 1em;
+      margin-bottom: 0.5em;
+    }
+
+    h3 {
+      color: #00774C;
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+      border-bottom: 1px dashed #00ABC8;
+      padding-bottom: 5px;
     }
 
     p {
@@ -57,37 +66,136 @@
       color: #265057;
     }
 
+    /* --- Question Group Styling --- */
+    .question-group {
+      margin-bottom: 30px;
+      padding: 15px;
+      border: 3px solid #00ABC8;
+      border-radius: 12px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .question-group.map-selection {
+        border-color: #FFB71B; /* Gold border for map questions */
+    }
+
+
+    /* --- Individual Question Styling (for map/checkbox) --- */
     .question {
-      margin-top: 20px;
-      padding: 12px;
-      border: 2px solid #00ABC8;
-      border-radius: 10px;
-      background-color: #fff;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background-color: #fefefe;
+      cursor: pointer;
       transition: background 0.2s ease;
     }
 
-    .question:hover {
-      background-color: #FFF5D6; /* subtle gold tint on hover */
+    .question.active-map-q {
+      background-color: #FFF5D6; /* soft gold tint for active section */
+      border-color: #FFB71B;
+      font-weight: bold;
     }
 
-    .question h3 {
-      margin: 0 0 10px;
-      font-size: 1.05em;
-      color: #00774C;
+    .question h4 {
+      margin: 0;
+      font-size: 1em;
+      color: #265057;
     }
 
     ul {
       padding-left: 20px;
       font-size: 0.95em;
+      list-style-type: disc;
+    }
+    
+    /* --- Likert Scale Styling --- */
+    .likert-scale {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #f7f9fb;
+        border-radius: 6px;
+    }
+    
+    .likert-scale > label { /* Target the main question label */
+        display: block;
+        font-size: 0.95em;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #00774C;
+    }
+    
+    .likert-options {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+        padding: 5px 0;
+        background-color: #ffffff;
+        border: 1px solid #eee;
+        border-radius: 4px;
+    }
+    
+    /* New styling for the option label (the clickable numbers) */
+    .likert-options label {
+        flex-grow: 1;
+        text-align: center;
+        padding: 5px 0;
+        cursor: pointer;
+        font-size: 0.85em;
+        transition: background-color 0.2s;
+        border-left: 1px solid #eee;
+        display: block;
+    }
+    
+    .likert-options input[type="radio"] {
+        display: none; /* Hide the actual radio button */
+    }
+    
+    .likert-options label:first-child { border-left: none; }
+    
+    .likert-options label:hover {
+        background-color: #e6f7ff;
+    }
+    
+    /* Style when the input inside the label is checked */
+    .likert-options input[type="radio"]:checked + span {
+        background-color: #00ABC8;
+        color: white;
+        font-weight: bold;
+    }
+    
+
+    /* --- Text Input Styling --- */
+    .short-answer {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
     }
 
+
     /* --- Map and Button --- */
-    #map {
+    /* Updated to apply to both map-q1 and map-q3 */
+    #map-q1, #map-q3 { 
       width: 100%;
       height: 70vh;
       margin-top: 20px;
+      margin-bottom: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      border: 3px solid #FFB71B; /* Gold border for emphasis */
+    }
+
+    .map-title {
+        text-align: center;
+        font-weight: bold;
+        color: #265057;
+        margin-top: 10px;
+        margin-bottom: -15px;
+        padding-top: 10px;
     }
 
     button {
@@ -118,17 +226,30 @@
         padding: 0.8em;
       }
       h2 {
-        font-size: 1.1em;
+        font-size: 1.2em;
       }
-      .question {
+      .question-group {
         padding: 10px;
       }
-      #map {
-        height: 60vh;
+      .question {
+        padding: 8px;
+      }
+      #map-q1, #map-q3 {
+        height: 50vh;
       }
       button {
         font-size: 1em;
       }
+      .likert-options {
+        flex-direction: column;
+      }
+      /* Ensure the label within the flex container is styled correctly on mobile */
+      .likert-options label {
+        padding: 5px;
+        border-left: none;
+        border-top: 1px solid #eee;
+      }
+      .likert-options label:first-child { border-top: none; }
     }
   </style>
 </head>
@@ -137,126 +258,708 @@
   <div class="banner">Braiding Knowledges Canada</div>
 
   <div class="container">
-    <h2>Survey: Identify Locations in Canada</h2>
-    <p>Please click exactly 3 points on the map for each of the following categories.</p>
+    <h2>Survey: Mapping Canada's North and South</h2>
+    <p>Please click on a question below to begin selecting on the appropriate map.</p>
 
     <form id="surveyForm">
-      <!-- All original survey questions remain unchanged -->
-      <div class="question">
-        <h3>1. Identify three locations that are definitely in Canada's <b>North</b></h3>
-        <input type="hidden" name="north" id="north">
-        <ul id="north-list"></ul>
+      <div class="question-group map-selection">
+        <h3>1. Locating Canada's North and South (Click 3 locations per category on the map below)</h3>
+        <p>Current active map question: <span id="activeQuestionDisplay" style="color: #FFB71B; font-weight: bold;">(None)</span></p>
+
+        <div class="question" data-category="north" data-map-id="mapQ1" data-max-points="3">
+          <h4>1.1. Identify three locations that are definitely in Canada's <b>North</b></h4>
+          <input type="hidden" name="north" id="north">
+          <ul id="north-list"></ul>
+        </div>
+
+        <div class="question" data-category="south" data-map-id="mapQ1" data-max-points="3">
+          <h4>1.2. Identify three locations that are definitely in Canada's <b>South</b></h4>
+          <input type="hidden" name="south" id="south">
+          <ul id="south-list"></ul>
+        </div>
+
+        <div class="question" data-category="southLimit" data-map-id="mapQ1" data-max-points="3">
+          <h4>1.3. Identify three locations that are in the <b>South but close to its northern limit</b></h4>
+          <input type="hidden" name="southLimit" id="southLimit">
+          <ul id="southLimit-list"></ul>
+        </div>
+
+        <div class="question" data-category="northLimit" data-map-id="mapQ1" data-max-points="3">
+          <h4>1.4. Identify three locations that are in the <b>North but close to its southern limit</b></h4>
+          <input type="hidden" name="northLimit" id="northLimit">
+          <ul id="northLimit-list"></ul>
+        </div>
+        
+        <div class="question" data-category="difficult" data-map-id="mapQ1" data-max-points="3">
+          <h4>1.5. Identify three locations that are <b>difficult for you to classify definitively as North or South</b></h4>
+          <input type="hidden" name="difficult" id="difficult">
+          <ul id="difficult-list"></ul>
+        </div>
+      </div>
+      
+      <div class="map-title">Map for Question 1: Click a point to mark a location. To reselect, click an existing marker to remove it first.</div>
+      <div id="map-q1"></div>
+      
+      <div class="question-group">
+        <h3>2. Conditions differentiating North and South in Canada</h3>
+        <p>As you located South and North in Canada, how important were the following factors? (1=Not Important, 5=Very Important)</p>
+
+        <input type="hidden" name="scaleLabels" value="1. Not Important, 2. Slightly Important, 3. Moderately Important, 4. Important, 5. Very Important">
+
+        <div class="likert-scale">
+            <label>2.1. Climate</label>
+            <div class="likert-options">
+                <label for="q21_1">
+                    <input type="radio" id="q21_1" name="q2_climate" value="1" required><span>1</span>
+                </label>
+                <label for="q21_2">
+                    <input type="radio" id="q21_2" name="q2_climate" value="2"><span>2</span>
+                </label>
+                <label for="q21_3">
+                    <input type="radio" id="q21_3" name="q2_climate" value="3"><span>3</span>
+                </label>
+                <label for="q21_4">
+                    <input type="radio" id="q21_4" name="q2_climate" value="4"><span>4</span>
+                </label>
+                <label for="q21_5">
+                    <input type="radio" id="q21_5" name="q2_climate" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="likert-scale">
+            <label>2.2. Cost of Living</label>
+            <div class="likert-options">
+                <label for="q22_1">
+                    <input type="radio" id="q22_1" name="q2_costOfLiving" value="1" required><span>1</span>
+                </label>
+                <label for="q22_2">
+                    <input type="radio" id="q22_2" name="q2_costOfLiving" value="2"><span>2</span>
+                </label>
+                <label for="q22_3">
+                    <input type="radio" id="q22_3" name="q2_costOfLiving" value="3"><span>3</span>
+                </label>
+                <label for="q22_4">
+                    <input type="radio" id="q22_4" name="q2_costOfLiving" value="4"><span>4</span>
+                </label>
+                <label for="q22_5">
+                    <input type="radio" id="q22_5" name="q2_costOfLiving" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="likert-scale">
+            <label>2.3. Growing Season</label>
+            <div class="likert-options">
+                <label for="q23_1">
+                    <input type="radio" id="q23_1" name="q2_growingSeason" value="1" required><span>1</span>
+                </label>
+                <label for="q23_2">
+                    <input type="radio" id="q23_2" name="q2_growingSeason" value="2"><span>2</span>
+                </label>
+                <label for="q23_3">
+                    <input type="radio" id="q23_3" name="q2_growingSeason" value="3"><span>3</span>
+                </label>
+                <label for="q23_4">
+                    <input type="radio" id="q23_4" name="q2_growingSeason" value="4"><span>4</span>
+                </label>
+                <label for="q23_5">
+                    <input type="radio" id="q23_5" name="q2_growingSeason" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="likert-scale">
+            <label>2.4. Latitude</label>
+            <div class="likert-options">
+                <label for="q24_1">
+                    <input type="radio" id="q24_1" name="q2_latitude" value="1" required><span>1</span>
+                </label>
+                <label for="q24_2">
+                    <input type="radio" id="q24_2" name="q2_latitude" value="2"><span>2</span>
+                </label>
+                <label for="q24_3">
+                    <input type="radio" id="q24_3" name="q2_latitude" value="3"><span>3</span>
+                </label>
+                <label for="q24_4">
+                    <input type="radio" id="q24_4" name="q2_latitude" value="4"><span>4</span>
+                </label>
+                <label for="q24_5">
+                    <input type="radio" id="q24_5" name="q2_latitude" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="likert-scale">
+            <label>2.5. People</label>
+            <div class="likert-options">
+                <label for="q25_1">
+                    <input type="radio" id="q25_1" name="q2_people" value="1" required><span>1</span>
+                </label>
+                <label for="q25_2">
+                    <input type="radio" id="q25_2" name="q2_people" value="2"><span>2</span>
+                </label>
+                <label for="q25_3">
+                    <input type="radio" id="q25_3" name="q2_people" value="3"><span>3</span>
+                </label>
+                <label for="q25_4">
+                    <input type="radio" id="q25_4" name="q2_people" value="4"><span>4</span>
+                </label>
+                <label for="q25_5">
+                    <input type="radio" id="q25_5" name="q2_people" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="likert-scale">
+            <label>2.6. Permafrost</label>
+            <div class="likert-options">
+                <label for="q26_1">
+                    <input type="radio" id="q26_1" name="q2_permafrost" value="1" required><span>1</span>
+                </label>
+                <label for="q26_2">
+                    <input type="radio" id="q26_2" name="q2_permafrost" value="2"><span>2</span>
+                </label>
+                <label for="q26_3">
+                    <input type="radio" id="q26_3" name="q2_permafrost" value="3"><span>3</span>
+                </label>
+                <label for="q26_4">
+                    <input type="radio" id="q26_4" name="q2_permafrost" value="4"><span>4</span>
+                </label>
+                <label for="q26_5">
+                    <input type="radio" id="q26_5" name="q2_permafrost" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="likert-scale">
+            <label>2.7. Roads</label>
+            <div class="likert-options">
+                <label for="q27_1">
+                    <input type="radio" id="q27_1" name="q2_roads" value="1" required><span>1</span>
+                </label>
+                <label for="q27_2">
+                    <input type="radio" id="q27_2" name="q2_roads" value="2"><span>2</span>
+                </label>
+                <label for="q27_3">
+                    <input type="radio" id="q27_3" name="q2_roads" value="3"><span>3</span>
+                </label>
+                <label for="q27_4">
+                    <input type="radio" id="q27_4" name="q2_roads" value="4"><span>4</span>
+                </label>
+                <label for="q27_5">
+                    <input type="radio" id="q27_5" name="q2_roads" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="likert-scale">
+            <label>2.8. Species Distribution</label>
+            <div class="likert-options">
+                <label for="q28_1">
+                    <input type="radio" id="q28_1" name="q2_speciesDistribution" value="1" required><span>1</span>
+                </label>
+                <label for="q28_2">
+                    <input type="radio" id="q28_2" name="q2_speciesDistribution" value="2"><span>2</span>
+                </label>
+                <label for="q28_3">
+                    <input type="radio" id="q28_3" name="q2_speciesDistribution" value="3"><span>3</span>
+                </label>
+                <label for="q28_4">
+                    <input type="radio" id="q28_4" name="q2_speciesDistribution" value="4"><span>4</span>
+                </label>
+                <label for="q28_5">
+                    <input type="radio" id="q28_5" name="q2_speciesDistribution" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="likert-scale">
+            <label>2.9. Vegetation Cover</label>
+            <div class="likert-options">
+                <label for="q29_1">
+                    <input type="radio" id="q29_1" name="q2_vegetationCover" value="1" required><span>1</span>
+                </label>
+                <label for="q29_2">
+                    <input type="radio" id="q29_2" name="q2_vegetationCover" value="2"><span>2</span>
+                </label>
+                <label for="q29_3">
+                    <input type="radio" id="q29_3" name="q2_vegetationCover" value="3"><span>3</span>
+                </label>
+                <label for="q29_4">
+                    <input type="radio" id="q29_4" name="q2_vegetationCover" value="4"><span>4</span>
+                </label>
+                <label for="q29_5">
+                    <input type="radio" id="q29_5" name="q2_vegetationCover" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="likert-scale">
+            <label for="q2_other">2.10. Other (Short Answer)</label>
+            <input type="text" id="q2_other" name="q2_other" class="short-answer" placeholder="Please specify...">
+        </div>
+      </div>
+      
+      <div class="question-group map-selection">
+        <h3>3. A little about your geography (Click 1 square per category on the map below)</h3>
+
+        <div class="question" data-category="live05" data-map-id="mapQ3" data-max-points="1">
+          <h4>3.1. In what  <b>square</b> did you live for most of the period when you were <b>0-5 years old</b>? **(Optional)**</h4>
+          <input type="hidden" name="live05" id="live05">
+          <ul id="live05-list"></ul>
+        </div>
+        
+        <div class="question" data-category="live10" data-map-id="mapQ3" data-max-points="1">
+          <h4>3.2. In what  <b>square</b> have you lived for most of the last <b>10 years</b>? **(Optional)**</h4>
+          <input type="hidden" name="live10" id="live10">
+          <ul id="live10-list"></ul>
+        </div>
+        
+        <div class="question" data-category="mostNorth" data-map-id="mapQ3" data-max-points="1">
+          <h4>3.3. What <b>square</b> is the <b>most northerly latitude</b> you have been in Canada? **(Optional)**</h4>
+          <input type="hidden" name="mostNorth" id="mostNorth">
+          <ul id="mostNorth-list"></ul>
+        </div>
+        
+        <div class="question" data-category="mostSouth" data-map-id="mapQ3" data-max-points="1">
+          <h4>3.4. What <b>square</b> is the <b>most southerly latitude</b> you have been in Canada? **(Optional)**</h4>
+          <input type="hidden" name="mostSouth" id="mostSouth">
+          <ul id="mostSouth-list"></ul>
+        </div>
       </div>
 
-      <div class="question">
-        <h3>2. Identify three locations that are definitely in Canada's <b>South</b></h3>
-        <input type="hidden" name="south" id="south">
-        <ul id="south-list"></ul>
+      <div class="map-title">Map for Question 3: Click a grid square to select it. Click a selected square again to un-select.</div>
+      <div id="map-q3"></div>
+      
+      <div class="question-group">
+        <h3>4. Mapping Canada's North and South</h3>
+        <p>Is mapping the location and extent of North and South in Canada...</p>
+
+        <input type="hidden" name="scaleLabels4" value="1. Definitely not, 2. Probably not, 3. Not sure, 4. Probably, 5. Definitely">
+
+        <div class="likert-scale">
+            <label>4.1. Possible?</label>
+            <div class="likert-options">
+                <label for="q41_1">
+                    <input type="radio" id="q41_1" name="q4_possible" value="1" required><span>1</span>
+                </label>
+                <label for="q41_2">
+                    <input type="radio" id="q41_2" name="q4_possible" value="2"><span>2</span>
+                </label>
+                <label for="q41_3">
+                    <input type="radio" id="q41_3" name="q4_possible" value="3"><span>3</span>
+                </label>
+                <label for="q41_4">
+                    <input type="radio" id="q41_4" name="q4_possible" value="4"><span>4</span>
+                </label>
+                <label for="q41_5">
+                    <input type="radio" id="q41_5" name="q4_possible" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="likert-scale">
+            <label>4.2. Useful?</label>
+            <div class="likert-options">
+                <label for="q42_1">
+                    <input type="radio" id="q42_1" name="q4_useful" value="1" required><span>1</span>
+                </label>
+                <label for="q42_2">
+                    <input type="radio" id="q42_2" name="q4_useful" value="2"><span>2</span>
+                </label>
+                <label for="q42_3">
+                    <input type="radio" id="q42_3" name="q4_useful" value="3"><span>3</span>
+                </label>
+                <label for="q42_4">
+                    <input type="radio" id="q42_4" name="q4_useful" value="4"><span>4</span>
+                </label>
+                <label for="q42_5">
+                    <input type="radio" id="q42_5" name="q4_useful" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="likert-scale">
+            <label>4.3. Interesting?</label>
+            <div class="likert-options">
+                <label for="q43_1">
+                    <input type="radio" id="q43_1" name="q4_interesting" value="1" required><span>1</span>
+                </label>
+                <label for="q43_2">
+                    <input type="radio" id="q43_2" name="q4_interesting" value="2"><span>2</span>
+                </label>
+                <label for="q43_3">
+                    <input type="radio" id="q43_3" name="q4_interesting" value="3"><span>3</span>
+                </label>
+                <label for="q43_4">
+                    <input type="radio" id="q43_4" name="q4_interesting" value="4"><span>4</span>
+                </label>
+                <label for="q43_5">
+                    <input type="radio" id="q43_5" name="q4_interesting" value="5" required><span>5</span>
+                </label>
+            </div>
+        </div>
       </div>
-
-      <div class="question">
-        <h3>3. Identify three locations that are in the <b>South but close to its northern limit</b></h3>
-        <input type="hidden" name="southLimit" id="southLimit">
-        <ul id="southLimit-list"></ul>
-      </div>
-
-      <div class="question">
-        <h3>4. Identify three locations that are in the <b>North but close to its southern limit</b></h3>
-        <input type="hidden" name="northLimit" id="northLimit">
-        <ul id="northLimit-list"></ul>
-      </div>
-
-      <!-- ✅ Map moved before submit button -->
-      <div id="map"></div>
-
+      
       <button type="submit">Submit Survey</button>
     </form>
   </div>
 
   <script>
-    // --- Original JS logic preserved ---
-    var map = L.map('map').setView([60, -95], 4);
+    // --- Map and State Setup ---
+    const geoJsonUrl = "https://raw.githubusercontent.com/jiaaog/wawin_survey/main/NTS_Simplified_WM.geojson";
+    let activeCategory = null;
+    let activeQuestionDisplay = document.getElementById('activeQuestionDisplay');
+    let geoJsonLayer = null;
+
+    // Initialize Map Q1 (Point Selection)
+    var mapQ1 = L.map('map-q1').setView([60, -95], 4);
+   // Esri World Imagery (Satellite/Terrain)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), (c) OpenStreetMap contributors, and the GIS User Community'
+  }).addTo(mapQ1); // Also add to mapQ3
+
+    // Initialize Map Q3 (Grid Selection)
+    var mapQ3 = L.map('map-q3').setView([60, -95], 5);
+  // Esri World TopoMap (Topographic/Labels)
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+  attribution: 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), (c) OpenStreetMap contributors, and the GIS User Community'
+  }).addTo(mapQ3); // for mapQ3
+    /***
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap'
-    }).addTo(map);
-
+    }).addTo(mapQ3);
+    ***/
+    // --- Data Storage and Configuration ---
     const categories = {
-      north: { color: "blue", max: 3, points: [], markers: [] },
-      south: { color: "green", max: 3, points: [], markers: [] },
-      southLimit: { color: "orange", max: 3, points: [], markers: [] },
-      northLimit: { color: "red", max: 3, points: [], markers: [] }
+      // Section 1 (mapQ1, point-based, max 3)
+      north: { map: mapQ1, color: "blue", max: 3, points: [], markers: [], title: "1.1. North (3 points)" },
+      south: { map: mapQ1, color: "green", max: 3, points: [], markers: [], title: "1.2. South (3 points)" },
+      southLimit: { map: mapQ1, color: "orange", max: 3, points: [], markers: [], title: "1.3. South near North Limit (3 points)" },
+      northLimit: { map: mapQ1, color: "red", max: 3, points: [], markers: [], title: "1.4. North near South Limit (3 points)" },
+      difficult: { map: mapQ1, color: "purple", max: 3, points: [], markers: [], title: "1.5. Difficult to Classify (3 points)" }, 
+      
+      // Section 3 (mapQ3, grid-based, max 1, OPTIONAL)
+      live05: { map: mapQ3, color: "cyan", max: 1, points: [], markers: [], title: "3.1. Lived 0-5 years (1 square)", isGrid: true }, 
+      live10: { map: mapQ3, color: "magenta", max: 1, points: [], markers: [], title: "3.2. Lived last 10 years (1 square)", isGrid: true }, 
+      mostNorth: { map: mapQ3, color: "black", max: 1, points: [], markers: [], title: "3.3. Most Northerly (1 square)", isGrid: true }, 
+      mostSouth: { map: mapQ3, color: "brown", max: 1, points: [], markers: [], title: "3.4. Most Southerly (1 square)", isGrid: true } 
     };
 
-    let activeCategory = null;
+    // --- Helper Functions ---
+    
+    // Function to calculate the centroid of a Leaflet layer's bounds
+    function getCentroidFromLayer(layer) {
+        const center = layer.getBounds().getCenter();
+        return [center.lat, center.lng];
+    }
+    
+    // Default style for the GeoJSON grid
+    function style(feature) {
+      return {
+        fillColor: 'transparent',
+        weight: 1,
+        opacity: 0.5,
+        color: '#FFB71B', // Grid color (Gold)
+        fillOpacity: 0.1
+      };
+    }
 
-    map.on('click', function(e) {
-      if (!activeCategory) {
-        alert("Please select a question to answer first by clicking its section.");
+    // Highlight style for selected grid
+    const highlightStyle = {
+      weight: 3,
+      color: '#00ABC8', // Aqua Blue border on selection
+      dashArray: '',
+      fillOpacity: 0.3,
+      fillColor: '#FFB71B' // Gold fill on selection
+    };
+
+    // Tolerance for floating point comparison (for coordinate checking)
+    const COORD_TOLERANCE = 0.0001; 
+
+    // Function to reset all Q3 styles and highlight the selected square for the active category
+    function resetAndHighlightActiveSelection(activeCatKey) {
+        if (!geoJsonLayer) return;
+
+        // 1. Reset all styles to default for the entire layer
+        geoJsonLayer.eachLayer(layer => {
+            geoJsonLayer.resetStyle(layer);
+        });
+
+        // 2. Highlight the selected square for the active category (if one exists)
+        const cat = categories[activeCatKey];
+        if (cat.isGrid && cat.points.length === 1) {
+            const selectedCentroid = cat.points[0];
+
+            geoJsonLayer.eachLayer(layer => {
+                const layerCentroid = getCentroidFromLayer(layer);
+                // Compare the stored centroid with the layer's centroid using tolerance
+                if (Math.abs(layerCentroid[0] - selectedCentroid[0]) < COORD_TOLERANCE && 
+                    Math.abs(layerCentroid[1] - selectedCentroid[1]) < COORD_TOLERANCE) {
+                    layer.setStyle(highlightStyle);
+                }
+            });
+        }
+    }
+
+
+    // --- Map Q3 (GeoJSON) Interaction ---
+    function onGridClick(e) {
+      if (!activeCategory || !categories[activeCategory].isGrid) {
+        alert("Please select a Question 3 category first by clicking its section.");
         return;
       }
 
       let cat = categories[activeCategory];
+      let layer = e.target;
+      const clickedCentroid = getCentroidFromLayer(layer);
+      
+      // Check if the clicked layer is the one currently selected for THIS category
+      const isCurrentlySelected = cat.points.length === 1 && 
+                                Math.abs(cat.points[0][0] - clickedCentroid[0]) < COORD_TOLERANCE &&
+                                Math.abs(cat.points[0][1] - clickedCentroid[1]) < COORD_TOLERANCE;
+
+      // --- Selection Logic ---
+      if (isCurrentlySelected) {
+          // 1. UN-SELECT (Toggle off)
+          layer.setStyle(style()); // Reset style to default
+          cat.points = [];
+      } else {
+          // 2. SELECT (Clear previous selection for this category, then select new)
+
+          // We reset all highlights first to ensure only the active category's selection is visible
+          // and to remove any previous highlight from this category if the user clicks a different square.
+          resetAndHighlightActiveSelection(activeCategory); 
+
+          // Apply new selection highlight
+          layer.setStyle(highlightStyle);
+          
+          // Save data (always replaces old data for Q3 max 1)
+          cat.points = [clickedCentroid]; 
+      }
+      
+      // --- Update Form and UI ---
+      document.getElementById(activeCategory).value = JSON.stringify(cat.points);
+      let ul = document.getElementById(activeCategory + "-list");
+      
+      if (cat.points.length === 1) {
+          ul.innerHTML = `<li>${cat.points[0][0].toFixed(4)}, ${cat.points[0][1].toFixed(4)} (Grid Center)</li>`;
+          // Fit map to the selected grid (only on selection)
+          mapQ3.fitBounds(layer.getBounds());
+      } else {
+          ul.innerHTML = "";
+      }
+    }
+
+    // Function to load the GeoJSON grid
+    function loadGeoJsonGrid() {
+      fetch(geoJsonUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.statusText);
+          }
+          return response.json();
+        })
+        .then(data => {
+          geoJsonLayer = L.geoJSON(data, {
+            style: style,
+            onEachFeature: function(feature, layer) {
+              layer.on({
+                click: onGridClick
+              });
+              layer.bindTooltip("Click to select this square", {
+                  permanent: false, 
+                  direction: "center", 
+                  className: "geojson-tooltip"
+              });
+            }
+          }).addTo(mapQ3);
+          
+          // Fit map Q3 to the bounds of the loaded GeoJSON data
+          mapQ3.fitBounds(geoJsonLayer.getBounds()); 
+        })
+        .catch(error => {
+          console.error("Could not load GeoJSON data from GitHub URL:", error);
+          alert("Error loading Canada grid data. Map Q3 selection may not work.");
+        });
+    }
+    
+    loadGeoJsonGrid(); // Load the GeoJSON on startup
+
+    // --- Map Q1 (Point) Interaction ---
+    mapQ1.on('click', function(e) {
+      if (!activeCategory || categories[activeCategory].isGrid) {
+        alert("Please select a Question 1 category first by clicking its section.");
+        return;
+      }
+      
+      let cat = categories[activeCategory];
+      
+      // Check for max limit (Q1 Reselection logic)
       if (cat.points.length >= cat.max) {
-        alert("You already selected 3 points for " + activeCategory);
+        alert(`You already selected the maximum of ${cat.max} point(s) for this question: ${cat.title.replace(/\s\(.*\)/, '')}. To change a selection, click on one of your existing markers on the map to remove it first.`);
         return;
       }
 
-      let marker = L.marker(e.latlng, { draggable: false })
-        .bindPopup(activeCategory + ": " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
-        .addTo(map);
+      // Create a colored circle marker
+      let marker = L.circleMarker(e.latlng, {
+          radius: 8,
+          fillColor: cat.color, 
+          color: "#000",
+          weight: 1,
+          opacity: 1,
+          fillOpacity: 0.7
+      }).bindPopup(cat.title.replace(/\s\(.*\)/, '') + ": " + e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4))
+        .addTo(mapQ1);
+      
+      // Add a click handler to remove markers
+      marker.on('click', function(mEvent) {
+          if (confirm("Remove this point?")) {
+              mapQ1.removeLayer(marker);
+              
+              // Remove the point from the array based on coordinates
+              const latlngToRemove = mEvent.latlng;
+              cat.points = cat.points.filter(p => 
+                  p[0].toFixed(6) !== latlngToRemove.lat.toFixed(6) || 
+                  p[1].toFixed(6) !== latlngToRemove.lng.toFixed(6)
+              );
+              cat.markers = cat.markers.filter(m => m !== marker);
+              
+              // Update the display list and form field
+              document.getElementById(activeCategory).value = JSON.stringify(cat.points);
+              let ul = document.getElementById(activeCategory + "-list");
+              ul.innerHTML = cat.points.map(p => 
+                  `<li>${p[0].toFixed(4)}, ${p[1].toFixed(4)}</li>`
+              ).join('');
+          }
+      });
 
       cat.points.push([e.latlng.lat, e.latlng.lng]);
       cat.markers.push(marker);
 
       document.getElementById(activeCategory).value = JSON.stringify(cat.points);
+      let ul = document.getElementById(activeCategory + "-list");
       let li = document.createElement("li");
       li.textContent = e.latlng.lat.toFixed(4) + ", " + e.latlng.lng.toFixed(4);
-      document.getElementById(activeCategory + "-list").appendChild(li);
+      ul.appendChild(li);
     });
 
+
+    // --- Question Click Handler (Activates Correct Map) ---
     document.querySelectorAll(".question").forEach(div => {
       div.addEventListener("click", () => {
-        document.querySelectorAll(".question").forEach(d => d.style.background = "#fff");
-        div.style.background = "#FFF5D6"; // soft gold tint for active section
-        activeCategory = div.querySelector("input").id;
+        // Clear active class from all questions
+        document.querySelectorAll(".question").forEach(d => d.classList.remove('active-map-q'));
+        
+        // Set active class on clicked question
+        div.classList.add('active-map-q');
+        
+        // Set active category and display
+        activeCategory = div.getAttribute("data-category");
+        activeQuestionDisplay.textContent = categories[activeCategory].title;
+        
+        // Invalidate size to ensure the active map is rendered fully
+        categories[activeCategory].map.invalidateSize();
+
+        // New logic for Q3 map: manage independent selection display
+        if (categories[activeCategory].map === mapQ3) {
+            resetAndHighlightActiveSelection(activeCategory);
+        } else if (geoJsonLayer) {
+            // Reset ALL highlights if switching to Map Q1
+            geoJsonLayer.eachLayer(layer => geoJsonLayer.resetStyle(layer));
+        }
       });
     });
 
+    // --- Submission Handler ---
     document.getElementById("surveyForm").onsubmit = function(e) {
       e.preventDefault();
 
+      // --- Validation for Map Questions (Q1 and Q3) ---
+      let mapData = {};
       for (let key in categories) {
-        if (categories[key].points.length !== 3) {
-          alert("Please select 3 points for " + key + " before submitting.");
-          return;
+        let cat = categories[key];
+        const maxPoints = parseInt(document.querySelector(`.question[data-category="${key}"]`).getAttribute('data-max-points'));
+        const isOptionalQ3 = cat.isGrid; // Q3 questions are optional (0 or 1 point)
+
+        // Validation for MANDATORY Q1 questions (must have exactly 3 points)
+        if (!isOptionalQ3 && cat.points.length !== maxPoints) {
+            alert(`Please select exactly ${maxPoints} point(s)/square(s) for the required question: ${cat.title.replace(/\s\(.*\)/, '')} before submitting.`);
+            return;
         }
+        
+        // Validation for OPTIONAL Q3 questions (must have 0 or 1 point)
+        if (isOptionalQ3 && cat.points.length > maxPoints) {
+             alert(`You selected too many squares for the optional question: ${cat.title.replace(/\s\(.*\)/, '')}. Max 1.`);
+             return;
+        }
+        
+        mapData[key] = cat.points;
+      }
+      
+      // --- Collect all form data (Q2 and Q4 Likert/Text) ---
+      let formData = new FormData(document.getElementById("surveyForm"));
+      let otherData = {};
+      
+      // Q2 Data
+      otherData['q2_climate'] = formData.get('q2_climate');
+      otherData['q2_costOfLiving'] = formData.get('q2_costOfLiving');
+      otherData['q2_growingSeason'] = formData.get('q2_growingSeason');
+      otherData['q2_latitude'] = formData.get('q2_latitude');
+      otherData['q2_people'] = formData.get('q2_people');
+      otherData['q2_permafrost'] = formData.get('q2_permafrost');
+      otherData['q2_roads'] = formData.get('q2_roads');
+      otherData['q2_speciesDistribution'] = formData.get('q2_speciesDistribution');
+      otherData['q2_vegetationCover'] = formData.get('q2_vegetationCover');
+      otherData['q2_other'] = formData.get('q2_other');
+
+      // Q4 Data
+      otherData['q4_possible'] = formData.get('q4_possible');
+      otherData['q4_useful'] = formData.get('q4_useful');
+      otherData['q4_interesting'] = formData.get('q4_interesting');
+      
+      // --- Combine all data for submission ---
+      let allData = {
+          mapSelections: mapData,
+          otherResponses: otherData
+      };
+      
+      // Basic check for required radio buttons in Q2/Q4
+      const requiredQKeys = Object.keys(otherData).filter(key => key !== 'q2_other');
+      for (let key of requiredQKeys) {
+          if (!otherData[key]) {
+              alert(`Please complete all required Likert scale questions (e.g., Q2/Q4). Missing value for: ${key.replace('q2_', 'Q2.').replace('q4_', 'Q4.')}`);
+              return;
+          }
       }
 
-      let data = {
-        north: categories.north.points,
-        south: categories.south.points,
-        southLimit: categories.southLimit.points,
-        northLimit: categories.northLimit.points
-      };
-
-      fetch("https://script.google.com/macros/s/AKfycbzdL3pesPI-rotFSxgmT1k06AASBEskksMvzqTh9b7gosBLxtpEuFzKWa0bXc_JFILl/exec", {
+      // NOTE: Ensure your Google Script is deployed and URL is correct.
+      fetch("https://script.google.com/macros/s/AKfycbycdYcyT1AswCgPwWmkIZ2xA4F49s_286iWkQLdSsSVDa1BD3xpQHCV_Xbnfyra7NSzQQ/exec", {
         method: "POST",
-        mode: "no-cors",
+        mode: "no-cors", 
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(allData) 
       })
       .then(() => {
-        alert("Survey submitted successfully!");
+        alert("Survey submitted successfully! Thank you.");
       })
       .catch(err => {
         console.error("Error:", err);
-        alert("Submission failed. Check console.");
+        alert("Submission failed. Check console for details.");
       });
     };
 
-    window.addEventListener('resize', () => map.invalidateSize());
+    // Ensure map size adjusts when window is resized and on load
+    window.addEventListener('resize', () => { 
+        mapQ1.invalidateSize();
+        mapQ3.invalidateSize();
+    });
+    // This timeout helps ensure the map container is fully sized before loading the tiles
+    setTimeout(() => { 
+        mapQ1.invalidateSize();
+        mapQ3.invalidateSize();
+    }, 500);
   </script>
 </body>
 </html>
-
-
