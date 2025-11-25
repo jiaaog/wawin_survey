@@ -136,7 +136,7 @@
         border-radius: 4px;
     }
     
-    /* New styling for the option label (the clickable numbers) */
+    /* New styling for the option label (the clickable numbers/text) */
     .likert-options label {
         flex-grow: 1;
         text-align: center;
@@ -258,7 +258,7 @@
   <div class="banner">Braiding Knowledges Canada</div>
 
   <div class="container">
-    <h2>Survey: Mapping Canada's North and South</h2>
+    <h2>Survey: Where is Canada's North?</h2>
     <p>Please click on a question below to begin selecting on the appropriate map.</p>
 
     <form id="surveyForm">
@@ -505,13 +505,13 @@
         <h3>3. A little about your geography (Click 1 square per category on the map below)</h3>
 
         <div class="question" data-category="live05" data-map-id="mapQ3" data-max-points="1">
-          <h4>3.1. In what square did you live for most of the period when you were <b>0-5 years old</b>? **(Optional)**</h4>
+          <h4>3.1. In what square did you live for most of the period when you were <b>0-5 years old</b>? (Optional)</h4>
           <input type="hidden" name="live05" id="live05">
           <ul id="live05-list"></ul>
         </div>
         
         <div class="question" data-category="live10" data-map-id="mapQ3" data-max-points="1">
-          <h4>3.2. In what square have you lived for most of the last <b>10 years</b>? **(Optional)**</h4>
+          <h4>3.2. In what square have you lived for most of the last <b>10 years</b>? (Optional) </h4>
           <input type="hidden" name="live10" id="live10">
           <ul id="live10-list"></ul>
         </div>
@@ -602,6 +602,26 @@
         </div>
       </div>
       
+      <div class="question-group">
+        <h3>5. Research Consent</h3>
+        <div class="likert-scale">
+            <label>5.1. You agree to the sharing of your data with other researchers for future, related research?</label>
+            <div class="likert-options" style="justify-content: center;">
+                <label for="q51_yes" style="max-width: 150px;">
+                    <input type="radio" id="q51_yes" name="q5_consent" value="Yes" required><span>Yes</span>
+                </label>
+                <label for="q51_no" style="max-width: 150px;">
+                    <input type="radio" id="q51_no" name="q5_consent" value="No"><span>No</span>
+                </label>
+            </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 30px; padding: 20px; background-color: #ffe6b8; border: 1px solid #FFB71B; border-radius: 8px;">
+          <h4>For your records:</h4>
+          <p style="text-align: left; margin: 0; color: #265057;">We recommend you take a screenshot or photograph of this page for future reference, as this information will not be available after you submit the survey.</p>
+      </div>
+      
       <button type="submit">Submit Survey</button>
     </form>
   </div>
@@ -613,19 +633,20 @@
     let activeQuestionDisplay = document.getElementById('activeQuestionDisplay');
     let geoJsonLayer = null;
 
-    // --- Map Initialization (Using Esri World Imagery as Basemap) ---
-    const esriImageryUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
-    const esriAttribution = 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+    // --- Map Initialization (Using Esri World TopoMap as Basemap) ---
+    // Change 1: Updated to Esri World TopoMap
+    const esriTopoUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
+    const esriAttribution = 'Tiles &copy; Esri &mdash; Esri, HERE, Garmin, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), (c) OpenStreetMap contributors, and the GIS User Community';
 
     // Initialize Map Q1 (Point Selection)
     var mapQ1 = L.map('map-q1').setView([60, -95], 4);
-    L.tileLayer(esriImageryUrl, {
+    L.tileLayer(esriTopoUrl, {
       attribution: esriAttribution
     }).addTo(mapQ1);
 
     // Initialize Map Q3 (Grid Selection)
     var mapQ3 = L.map('map-q3').setView([60, -95], 4);
-    L.tileLayer(esriImageryUrl, {
+    L.tileLayer(esriTopoUrl, {
       attribution: esriAttribution
     }).addTo(mapQ3);
     
@@ -774,11 +795,7 @@
             }
           }).addTo(mapQ3);
           
-          // *******************************************************************
-          // FIX: REMOVED mapQ3.fitBounds() to maintain the setView zoom level 
-          // and match mapQ1's initial zoom.
-          // *******************************************************************
-          // mapQ3.fitBounds(geoJsonLayer.getBounds()); 
+          // mapQ3.fitBounds(geoJsonLayer.getBounds()); // Removed to fix the zoom issue
         })
         .catch(error => {
           console.error("Could not load GeoJSON data from GitHub URL:", error);
@@ -899,7 +916,7 @@
         mapData[key] = cat.points;
       }
       
-      // --- Collect all form data (Q2 and Q4 Likert/Text) ---
+      // --- Collect all form data (Q2, Q4, and Q5 Likert/Text) ---
       let formData = new FormData(document.getElementById("surveyForm"));
       let otherData = {};
       
@@ -920,17 +937,21 @@
       otherData['q4_useful'] = formData.get('q4_useful');
       otherData['q4_interesting'] = formData.get('q4_interesting');
       
+      // Q5 Data (New)
+      otherData['q5_consent'] = formData.get('q5_consent');
+      
       // --- Combine all data for submission ---
       let allData = {
           mapSelections: mapData,
           otherResponses: otherData
       };
       
-      // Basic check for required radio buttons in Q2/Q4
+      // Basic check for required radio buttons in Q2/Q4/Q5
       const requiredQKeys = Object.keys(otherData).filter(key => key !== 'q2_other');
       for (let key of requiredQKeys) {
           if (!otherData[key]) {
-              alert(`Please complete all required Likert scale questions (e.g., Q2/Q4). Missing value for: ${key.replace('q2_', 'Q2.').replace('q4_', 'Q4.')}`);
+              // Updated alert to include Q5
+              alert(`Please complete all required Likert scale questions (e.g., Q2/Q4/Q5). Missing value for: ${key.replace('q2_', 'Q2.').replace('q4_', 'Q4.').replace('q5_', 'Q5.')}`);
               return;
           }
       }
@@ -964,5 +985,3 @@
   </script>
 </body>
 </html>
-
-
