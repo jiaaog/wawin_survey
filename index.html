@@ -273,7 +273,7 @@
         <h4 style="color: #00ABC8; margin-top: 1em; border-bottom: 1px solid #eee; padding-bottom: 5px;">Researcher Team</h4>
         <p style="text-align: left; margin: 0; padding-left: 20px;">
             <strong>Principal Investigator:</strong> Murray Humphries, Professor, McGill University | 514-794-7885 | murray.humphries@mcgill.ca<br>
-            <strong>Project Coordinator:</strong> Kirsten Bowser, Research Assistance, McGill University and the Canadian Mountain Network | 438-497-5668 | kirsten.bowser@mcgill.ca<br>
+            <strong>Project Coordinator:</strong> Kirsten Bowser, Research Assistant, McGill University and Braiding Knowledge Canada | 438-497-5668 | kirsten.bowser@mcgill.ca<br>
             <strong>Researchers:</strong> Allyson Menzies allyson.menzies@ucalgary.ca, Jiaao Guo jiaao.guo1@ucalgary.ca, Shelby Bohn shelby.bohn@ucalgary.ca
         </p>
         
@@ -308,7 +308,7 @@
             <strong>For your records:</strong> We recommend you take a screenshot or photograph of this consent page and any other survey pages of interest, as this information will not be available after you submit the survey.
         </p>
         
-        <p style="text-align: left; font-size: 0.9em;">
+         <p style="text-align: left; margin-bottom: 1em;">
             If you have any ethical concerns or complaints about your participation in this study, and want to speak with someone not on the research team, please contact:<br>
             Deanna Collin<br>
             Research Ethics Officer/ Conseiller en éthique de recherche <br>
@@ -382,8 +382,29 @@
 
                 <input type="hidden" name="scaleLabels" value="i. Not Important, ii. Slightly Important, iii. Moderately Important, iv. Important, v. Very Important">
 
+               <div class="likert-scale">
+                    <label>2.1. Animals (including who lives where)</label>
+                    <div class="likert-options">
+                        <label for="q28_1">
+                            <input type="radio" id="q28_1" name="q2_speciesDistribution" value="1" required><span>i. Not Important</span>
+                        </label>
+                        <label for="q28_2">
+                            <input type="radio" id="q28_2" name="q2_speciesDistribution" value="2"><span>ii. Slightly Important</span>
+                        </label>
+                        <label for="q28_3">
+                            <input type="radio" id="q28_3" name="q2_speciesDistribution" value="3"><span>iii. Moderately Important</span>
+                        </label>
+                        <label for="q28_4">
+                            <input type="radio" id="q28_4" name="q2_speciesDistribution" value="4"><span>iv. Important</span>
+                        </label>
+                        <label for="q28_5">
+                            <input type="radio" id="q28_5" name="q2_speciesDistribution" value="5" required><span>v. Very Important</span>
+                        </label>
+                    </div>
+                </div>
+              
                 <div class="likert-scale">
-                    <label>2.1. Climate</label>
+                    <label>2.2. Climate</label>
                     <div class="likert-options">
                         <label for="q21_1">
                             <input type="radio" id="q21_1" name="q2_climate" value="1" required><span>i. Not Important</span>
@@ -404,7 +425,7 @@
                 </div>
 
                 <div class="likert-scale">
-                    <label>2.2. Cost of Living</label>
+                    <label>2.3. Cost of Living</label>
                     <div class="likert-options">
                         <label for="q22_1">
                             <input type="radio" id="q22_1" name="q2_costOfLiving" value="1" required><span>i. Not Important</span>
@@ -425,7 +446,7 @@
                 </div>
                 
                 <div class="likert-scale">
-                    <label>2.3. Growing Season</label>
+                    <label>2.4. Growing Season</label>
                     <div class="likert-options">
                         <label for="q23_1">
                             <input type="radio" id="q23_1" name="q2_growingSeason" value="1" required><span>i. Not Important</span>
@@ -446,7 +467,7 @@
                 </div>
                 
                 <div class="likert-scale">
-                    <label>2.4. Latitude</label>
+                    <label>2.5. Latitude</label>
                     <div class="likert-options">
                         <label for="q24_1">
                             <input type="radio" id="q24_1" name="q2_latitude" value="1" required><span>i. Not Important</span>
@@ -467,7 +488,7 @@
                 </div>
                 
                 <div class="likert-scale">
-                    <label>2.5. People (including who lives where)</label>
+                    <label>2.6. People (including who lives where)</label>
                     <div class="likert-options">
                         <label for="q25_1">
                             <input type="radio" id="q25_1" name="q2_people" value="1" required><span>i. Not Important</span>
@@ -488,7 +509,7 @@
                 </div>
                 
                 <div class="likert-scale">
-                    <label>2.6. Permafrost</label>
+                    <label>2.7. Permafrost</label>
                     <div class="likert-options">
                         <label for="q26_1">
                             <input type="radio" id="q26_1" name="q2_permafrost" value="1" required><span>i. Not Important</span>
@@ -509,7 +530,7 @@
                 </div>
                 
                 <div class="likert-scale">
-                    <label>2.7. Roads</label>
+                    <label>2.8. Roads</label>
                     <div class="likert-options">
                         <label for="q27_1">
                             <input type="radio" id="q27_1" name="q2_roads" value="1" required><span>i. Not Important</span>
@@ -529,26 +550,7 @@
                     </div>
                 </div>
                 
-                <div class="likert-scale">
-                    <label>2.8. Animals (including who lives where)</label>
-                    <div class="likert-options">
-                        <label for="q28_1">
-                            <input type="radio" id="q28_1" name="q2_speciesDistribution" value="1" required><span>i. Not Important</span>
-                        </label>
-                        <label for="q28_2">
-                            <input type="radio" id="q28_2" name="q2_speciesDistribution" value="2"><span>ii. Slightly Important</span>
-                        </label>
-                        <label for="q28_3">
-                            <input type="radio" id="q28_3" name="q2_speciesDistribution" value="3"><span>iii. Moderately Important</span>
-                        </label>
-                        <label for="q28_4">
-                            <input type="radio" id="q28_4" name="q2_speciesDistribution" value="4"><span>iv. Important</span>
-                        </label>
-                        <label for="q28_5">
-                            <input type="radio" id="q28_5" name="q2_speciesDistribution" value="5" required><span>v. Very Important</span>
-                        </label>
-                    </div>
-                </div>
+               
                 
                 <div class="likert-scale">
                     <label>2.9. Trees and other plants (including who lives where)</label>
@@ -1102,6 +1104,7 @@
   </script>
 </body>
 </html>
+
 
 
 
